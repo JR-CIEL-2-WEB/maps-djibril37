@@ -30,7 +30,11 @@
     document.getElementById("Button1").addEventListener('click', readTab);
 
     function readTab() {
-       
+        // Boucle sur toutes les propriétés de l'objet
+        for (var key in objCD) {
+            console.log(key + " : " + objCD[key]);
+        }
+    }
 </script>
 
 </body>
