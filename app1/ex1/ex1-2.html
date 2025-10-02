@@ -226,12 +226,17 @@
 
 	var i;
 	document.getElementById("Button1").addEventListener('click',readTab);
+function readTab(){
+  var CDstab = JSON.parse(CDs);  
+  for (var i = 0; i < CDstab.length; i++) {
+    console.log("CD[" + i + "]=");
+    var cd = CDstab[i];
 
-	function readTab(){
-       //TODO
-
-	}
-
+    for (var cle in cd) {
+      console.log(cle + ": " + cd[cle]);
+    }
+}
+}
 </script>
 
 </body>
