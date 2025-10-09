@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>json Employes</title>
+    <title>JRostand Reperes Stade</title>
 </head>
 <body>
 
@@ -13,7 +13,8 @@
     /* Always set the map height explicitly to define the size of the div
      * element that contains the map. */
     #map {
-        height: 100%;
+        height: 400px; /* Changé de 100% à 400px pour mieux voir */
+        width: 100%;
     }
 
     /* Optional: Makes the sample page fill the window. */
@@ -25,52 +26,44 @@
     }
 </style>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7Y32T_PJHZxYcK3BJYJFNwSl6cuvLXpo&callback=initMap"></script>
+<!-- SUPPRIMER le callback=initMap -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7Y32T_PJHZxYcK3BJYJFNwSl6cuvLXpo"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
 <script>
-    // au chargement de la page
-    window.onload = loadDoc();
-
     let markersData = [];
     let map;
+
+    // au chargement de la page
+    window.onload = loadDoc;
 
     // Ajax avec JQuery
     function loadDoc() {
         $.ajax({
-                url: "markersJrostand.json",
-                method: "GET",
-                //data: { id : menuId },
-                dataType: "json",
-                success: function(markers){
-                            /* markers representera un objet JSON retourné par le serveur */
-                            markersData = markers;
-                            
-                            /*
-                                compléter le code de la fonction afin d'afficher les chaque coordonnée  à la console
-                            */
+            url: "markersJrostand.json",
+            method: "GET",
+            dataType: "json",
+            success: function(markers){
+                markersData = markers;
+                
+                // Affichage dans la console avec double boucle
+                for(let i = 0; i < markers.length; i++){
+                    let marker = markers[i];
+                    for(key in marker){
+                        console.log(key + ":" + marker[key]);
+                    }
+                    console.log("____________");
+                }
 
-                            /*
-                                vous utiliserez deux boucles for
-                                - boucle for classique sur markers
-                                - boucle for in sur marker
-                             */
-                            for(let i = 0; i < markers.length; i++){
-                                let marker = markers[i];
-                                for(key in marker){
-                                    console.log(key + ":" + marker[key]);
-                                }
-                                console.log("____________");
-                            }
-
-                            /*
-                                Créer des markers Google avec l'API Google Maps en utilisant l'objet renvoyé par
-                                le serveur web. Afficher votre map.
-                             */
-                            initMap();
-                        }
+                // Initialiser la carte APRÈS avoir chargé les données
+                initMap();
+            },
+            error: function(xhr, status, error) {
+                console.error("Erreur lors du chargement JSON:", error);
+                // Initialiser quand même la carte en cas d'erreur
+                initMap();
             }
-        );
+        });
     };
 
     function initMap(){
