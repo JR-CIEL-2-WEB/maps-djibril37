@@ -1,0 +1,51 @@
+<html >
+
+</html >
+
+<tête >
+ <titre > Marqueurs simples </ titre >
+
+ <lien rel = "feuille de style" type = "texte/css" href = "./style.css" />
+ <script type = "module" src = "./index.js" ></ script >
+ </tête >
+
+ <corps >
+ <div id = "carte" ></ div >
+
+ <!--
+ L'attribut « defer » provoque l'exécution du script après le HTML complet
+ Le document a été analysé. Pour des utilisations non bloquantes, évitant les situations de concurrence,
+ et un comportement cohérent sur tous les navigateurs, pensez à charger en utilisant des promesses. Voir
+ https://developers.google.com/maps/documentation/javascript/load-maps-js-api
+ pour plus d'informations.
+ -->
+ < script
+        src = " https://maps.googleapis.com/maps/api/js?key=AIzaSyA7Y32T_PJHZxYcK3BJYJFNwSl6cuvLXpo&callback=initMap&v=weekly "
+        différer ></ script >
+ < script >
+        fonction initMap () {
+            constante monLatLng = { lat : 48.95930033308523 , gnl : 2,5477890651742516 };
+            constante positions du marqueur = [
+ { lat : 48.95930033308523 , gnl : 2,5477890651742516 },
+ { lat : 48.95901659236071 , gnl : 2.544364368005043 },
+ { lat : 48.96083250510581 , gnl : 2,5428194730675138 },
+ { lat : 48.96334006261106 , gnl : 2,5503223316267305 },
+ { lat : 48.96146800531762 , gnl : 2,553135524155863 },
+ { lat : 48.95997156116078 , gnl : 2,548567662388221 }
+ ];
+            constante carte = nouvelle google . maps . Map ( document . getElementById ( "carte" ), {
+                zoom : 15 ,
+                centre : monLatLng ,
+ });
+
+            marqueurPositions . forEach (( position , idx ) => {
+                nouveau Google Maps Marqueur ( {​
+                    position ,
+                    carte ,
+                    titre : `Marqueur ${ idx + 1 } ` ,
+ 
+        fenêtre . initMap = initMap ;
+    </ script >
+</ corps >
+
+</ html>
