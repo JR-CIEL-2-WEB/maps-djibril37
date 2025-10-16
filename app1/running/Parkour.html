@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parcours Running</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        /* Menu Hamburger */
+        .hamburger-menu {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .menu-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .menu-btn span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background: white;
+            margin: 3px 0;
+            transition: 0.3s;
+            border-radius: 2px;
+        }
+
+        /* Menu déroulant */
+        .menu-content {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 10px 0;
+            min-width: 200px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .menu-content.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .menu-content a {
+            display: block;
+            padding: 15px 20px;
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .menu-content a:last-child {
+            border-bottom: none;
+        }
+
+        .menu-content a:hover {
+            background: #667eea;
+            color: white;
+            transform: translateX(5px);
+        }
+
+        /* Contenu principal */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 100px 20px 20px 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            margin-bottom: 50px;
+            opacity: 0.9;
+        }
+
+        .parcours-info {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .parcours-info h2 {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .parcours-info ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        .parcours-info li {
+            margin-bottom: 15px;
+            padding-left: 10px;
+            border-left: 3px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <!-- Menu Hamburger -->
+    <div class="hamburger-menu">
+        <button class="menu-btn" id="menuBtn">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="menu-content" id="menuContent">
+            <a href="#" onclick="selectParcours(1)">Parcours 1</a>
+            <a href="#" onclick="selectParcours(2)">Parcours 2</a>
+            <a href="#" onclick="selectParcours(3)">Parcours 3</a>
+        </div>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="container">
+        <h1>🏃‍♂️ Parcours Running</h1>
+        <p class="subtitle">Choisissez votre parcours préféré</p>
+        
+        <div class="parcours-info">
+            <h2>📋 Nos Parcours</h2>
+            <ul>
+                <li><strong>Parcours 1 :</strong> Parc de la BUT (Sevran) → Parc du Sausset (Aulnay-sous-Bois)</li>
+                <li><strong>Parcours 2 :</strong> Collège de la Pléiade (Sevran) → Lycée Voillum (Aulnay-sous-Bois)</li>
+                <li><strong>Parcours 3 :</strong> Cité Basse (Sevran) → Lycée Jean-Rostand (Villepinte)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Gestion du menu hamburger
+        const menuBtn = document.getElementById('menuBtn');
+        const menuContent = document.getElementById('menuContent');
+
+        menuBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            menuContent.classList.toggle('show');
+        });
+
+        // Fermer le menu en cliquant ailleurs
+        document.addEventListener('click', function() {
+            menuContent.classList.remove('show');
+        });
+
+        // Empêcher la fermeture quand on clique dans le menu
+        menuContent.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        // Sélection d'un parcours
+        function selectParcours(numero) {
+            // Fermer le menu
+            menuContent.classList.remove('show');
+            
+            // Rediriger vers la page Google Maps avec le parcours sélectionné
+            // Pour l'instant, on affiche juste une alerte
+            const parcours = [
+                "Parc de la BUT → Parc du Sausset",
+                "Collège de la Pléiade → Lycée Voillum", 
+                "Cité Basse → Lycée Jean-Rostand"
+            ];
+            
+            alert(`🎯 Parcours ${numero} sélectionné : ${parcours[numero-1]}\n\nRedirection vers la carte Google Maps...`);
+            
+            // Plus tard, vous pourrez rediriger vers votre page Google Maps :
+            // window.location.href = `votre-page-google-maps.html?parcours=${numero}`;
+        }
+    </script>
+</body>
+</html>
