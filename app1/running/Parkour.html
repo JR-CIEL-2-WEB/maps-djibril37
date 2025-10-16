@@ -1,33 +1,29 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parcours Running</title>
+    <meta charset="utf-8">
+    <title>Parcours Running - Google Maps</title>
     <style>
-        * {
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+        body {
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: white;
         }
-
-        /* Menu Hamburger */
-        .hamburger-menu {
+        
+        /* Menu Hamburger pour Google Maps */
+        .maps-hamburger {
             position: fixed;
             top: 20px;
-            right: 20px;
+            left: 20px;
             z-index: 1000;
         }
 
-        .menu-btn {
-            background: rgba(255, 255, 255, 0.2);
+        .maps-menu-btn {
+            background: white;
             border: none;
             border-radius: 50%;
             width: 50px;
@@ -37,176 +33,231 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
 
-        .menu-btn span {
+        .maps-menu-btn span {
             display: block;
-            width: 25px;
-            height: 3px;
-            background: white;
-            margin: 3px 0;
+            width: 20px;
+            height: 2px;
+            background: #333;
+            margin: 2px 0;
             transition: 0.3s;
-            border-radius: 2px;
         }
 
-        /* Menu déroulant */
-        .menu-content {
+        .maps-menu-content {
             position: absolute;
             top: 60px;
-            right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
+            left: 0;
+            background: white;
+            border-radius: 10px;
             padding: 10px 0;
             min-width: 200px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
             opacity: 0;
             visibility: hidden;
             transform: translateY(-10px);
             transition: all 0.3s ease;
         }
 
-        .menu-content.show {
+        .maps-menu-content.show {
             opacity: 1;
             visibility: visible;
             transform: translateY(0);
         }
 
-        .menu-content a {
+        .maps-menu-content a {
             display: block;
-            padding: 15px 20px;
+            padding: 12px 15px;
             color: #333;
             text-decoration: none;
             font-weight: 500;
             transition: all 0.3s ease;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid #eee;
         }
 
-        .menu-content a:last-child {
+        .maps-menu-content a:last-child {
             border-bottom: none;
         }
 
-        .menu-content a:hover {
-            background: #667eea;
-            color: white;
-            transform: translateX(5px);
+        .maps-menu-content a:hover {
+            background: #f0f0f0;
         }
 
-        /* Contenu principal */
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 100px 20px 20px 20px;
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 3em;
-            margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .subtitle {
-            font-size: 1.2em;
-            margin-bottom: 50px;
-            opacity: 0.9;
-        }
-
-        .parcours-info {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+        /* Indicateur de parcours */
+        .parcours-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 20px;
             border-radius: 20px;
-            padding: 30px;
-            margin-top: 30px;
-            text-align: left;
-        }
-
-        .parcours-info h2 {
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
-
-        .parcours-info ul {
-            list-style: none;
-            padding-left: 20px;
-        }
-
-        .parcours-info li {
-            margin-bottom: 15px;
-            padding-left: 10px;
-            border-left: 3px solid #667eea;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            font-weight: bold;
+            z-index: 999;
         }
     </style>
 </head>
 <body>
-    <!-- Menu Hamburger -->
-    <div class="hamburger-menu">
-        <button class="menu-btn" id="menuBtn">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        <div class="menu-content" id="menuContent">
-            <a href="#" onclick="selectParcours(1)">Parcours 1</a>
-            <a href="#" onclick="selectParcours(2)">Parcours 2</a>
-            <a href="#" onclick="selectParcours(3)">Parcours 3</a>
-        </div>
-    </div>
 
-    <!-- Contenu principal -->
-    <div class="container">
-        <h1>🏃‍♂️ Parcours Running</h1>
-        <p class="subtitle">Choisissez votre parcours préféré</p>
+<!-- Menu Hamburger -->
+<div class="maps-hamburger">
+    <button class="maps-menu-btn" id="mapsMenuBtn">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <div class="maps-menu-content" id="mapsMenuContent">
+        <a href="Parkours.html">🎯 Changer de Parcours</a>
+        <a href="#" onclick="loadParcours(1)">Parcours 1</a>
+        <a href="#" onclick="loadParcours(2)">Parcours 2</a>
+        <a href="#" onclick="loadParcours(3)">Parcours 3</a>
+    </div>
+</div>
+
+<!-- Indicateur du parcours actuel -->
+<div class="parcours-indicator" id="parcoursIndicator">
+    Chargement...
+</div>
+
+<div id="map">...</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7Y32T_PJHZxYcK3BJYJFNwSl6cuvLXpo"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+    let markers = [];
+    let map;
+    let currentPolyline = null;
+    let currentParcours = null;
+
+    // Au chargement de la page
+    $(document).ready(function() {
+        initMap();
         
-        <div class="parcours-info">
-            <h2>📋 Nos Parcours</h2>
-            <ul>
-                <li><strong>Parcours 1 :</strong> Parc de la BUT (Sevran) → Parc du Sausset (Aulnay-sous-Bois)</li>
-                <li><strong>Parcours 2 :</strong> Collège de la Pléiade (Sevran) → Lycée Voillum (Aulnay-sous-Bois)</li>
-                <li><strong>Parcours 3 :</strong> Cité Basse (Sevran) → Lycée Jean-Rostand (Villepinte)</li>
-            </ul>
-        </div>
-    </div>
-
-    <script>
-        // Gestion du menu hamburger
-        const menuBtn = document.getElementById('menuBtn');
-        const menuContent = document.getElementById('menuContent');
-
-        menuBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            menuContent.classList.toggle('show');
-        });
-
-        // Fermer le menu en cliquant ailleurs
-        document.addEventListener('click', function() {
-            menuContent.classList.remove('show');
-        });
-
-        // Empêcher la fermeture quand on clique dans le menu
-        menuContent.addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-
-        // Sélection d'un parcours
-        function selectParcours(numero) {
-            // Fermer le menu
-            menuContent.classList.remove('show');
-            
-            // Rediriger vers la page Google Maps avec le parcours sélectionné
-            // Pour l'instant, on affiche juste une alerte
-            const parcours = [
-                "Parc de la BUT → Parc du Sausset",
-                "Collège de la Pléiade → Lycée Voillum", 
-                "Cité Basse → Lycée Jean-Rostand"
-            ];
-            
-            alert(`🎯 Parcours ${numero} sélectionné : ${parcours[numero-1]}\n\nRedirection vers la carte Google Maps...`);
-            
-            // Plus tard, vous pourrez rediriger vers votre page Google Maps :
-            // window.location.href = `votre-page-google-maps.html?parcours=${numero}`;
+        // Récupérer le paramètre parcours depuis l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const parcoursParam = urlParams.get('parcours');
+        
+        if (parcoursParam) {
+            loadParcours(parseInt(parcoursParam));
+        } else {
+            // Par défaut, charger le parcours 1
+            loadParcours(1);
         }
-    </script>
+    });
+
+    // Gestion du menu hamburger
+    const mapsMenuBtn = document.getElementById('mapsMenuBtn');
+    const mapsMenuContent = document.getElementById('mapsMenuContent');
+
+    mapsMenuBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        mapsMenuContent.classList.toggle('show');
+    });
+
+    document.addEventListener('click', function() {
+        mapsMenuContent.classList.remove('show');
+    });
+
+    mapsMenuContent.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+
+    function initMap() {
+        const options = {
+            center: new google.maps.LatLng(48.9500, 2.5300),
+            zoom: 13,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+
+        map = new google.maps.Map(document.getElementById("map"), options);
+    }
+
+    function loadParcours(numero) {
+        mapsMenuContent.classList.remove('show');
+        currentParcours = numero;
+        
+        // Mettre à jour l'indicateur
+        document.getElementById('parcoursIndicator').textContent = `Parcours ${numero}`;
+        
+        // Définir les coordonnées pour chaque parcours
+        const parcoursData = {
+            1: [
+                { lat: 48.9400, lng: 2.5300, name: "Parc de la BUT (Départ)" },
+                { lat: 48.9350, lng: 2.5200, name: "Point intermédiaire" },
+                { lat: 48.9300, lng: 2.5100, name: "Parc du Sausset (Arrivée)" }
+            ],
+            2: [
+                { lat: 48.9450, lng: 2.5350, name: "Collège Pléiade (Départ)" },
+                { lat: 48.9420, lng: 2.5280, name: "Point intermédiaire" },
+                { lat: 48.9380, lng: 2.5220, name: "Lycée Voillum (Arrivée)" }
+            ],
+            3: [
+                { lat: 48.9480, lng: 2.5400, name: "Cité Basse (Départ)" },
+                { lat: 48.9520, lng: 2.5380, name: "Point intermédiaire" },
+                { lat: 48.9600, lng: 2.5386, name: "Lycée Jean-Rostand (Arrivée)" }
+            ]
+        };
+
+        displayParcours(parcoursData[numero], `Parcours ${numero}`);
+    }
+
+    function displayParcours(parcoursMarkers, titre) {
+        // Effacer les marqueurs précédents
+        clearMarkers();
+        
+        const path = [];
+
+        for (let i = 0; i < parcoursMarkers.length; i++) {
+            const point = new google.maps.LatLng(parcoursMarkers[i].lat, parcoursMarkers[i].lng);
+            path.push(point);
+
+            const marker = new google.maps.Marker({
+                position: point,
+                map: map,
+                title: parcoursMarkers[i].name,
+                label: (i + 1).toString()
+            });
+
+            const infowindow = new google.maps.InfoWindow({
+                content: `<strong>${parcoursMarkers[i].name}</strong><br>${titre} - Point ${i + 1}`
+            });
+
+            marker.addListener('click', function() {
+                infowindow.open(map, marker);
+            });
+
+            markers.push(marker);
+        }
+
+        // Centrer la carte sur le parcours
+        if (path.length > 0) {
+            const bounds = new google.maps.LatLngBounds();
+            path.forEach(point => bounds.extend(point));
+            map.fitBounds(bounds);
+        }
+
+        // Dessiner la polyline
+        if (currentPolyline) {
+            currentPolyline.setMap(null);
+        }
+
+        currentPolyline = new google.maps.Polyline({
+            path: path,
+            geodesic: true,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 4,
+            map: map
+        });
+    }
+
+    function clearMarkers() {
+        markers.forEach(marker => marker.setMap(null));
+        markers = [];
+    }
+</script>
+
 </body>
 </html>
