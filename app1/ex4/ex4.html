@@ -136,30 +136,36 @@
     });
 
     // Charger un parcours spécifique
-    function loadParcours(numero) {
-        mapsMenuContent.classList.remove('show');
-        
-        // Définir les coordonnées pour chaque parcours
-        const parcoursData = {
-            1: [ // Parcours 1: Parc de la BUT → Parc du Sausset
-                { lat: 48.9400, lng: 2.5300 }, // Parc de la BUT (Sevran)
-                { lat: 48.9350, lng: 2.5200 }, // Point intermédiaire
-                { lat: 48.9300, lng: 2.5100 }  // Parc du Sausset (Aulnay)
-            ],
-            2: [ // Parcours 2: Collège Pléiade → Lycée Voillum
-                { lat: 48.9450, lng: 2.5350 }, // Collège Pléiade (Sevran)
-                { lat: 48.9420, lng: 2.5280 }, // Point intermédiaire
-                { lat: 48.9380, lng: 2.5220 }  // Lycée Voillum (Aulnay)
-            ],
-            3: [ // Parcours 3: Cité Basse → Lycée Jean-Rostand
-                { lat: 48.9480, lng: 2.5400 }, // Cité Basse (Sevran)
-                { lat: 48.9520, lng: 2.5380 }, // Point intermédiaire
-                { lat: 48.9600, lng: 2.5386 }  // Lycée Jean-Rostand (Villepinte)
-            ]
-        };
-
-        displayParcours(parcoursData[numero], `Parcours ${numero}`);
-    }
+    // Charger un parcours spécifique AVEC FETCH
+function loadParcours(numero) {
+    mapsMenuContent.classList.remove('show');
+    
+    console.log(`🎯 Chargement du parcours ${numero} depuis le JSON...`);
+    
+    // REQUÊTE FETCH vers le fichier JSON
+    fetch('../ext5/course.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erreur de chargement du fichier JSON');
+            }
+            return response.json();
+        })
+        .then(courses => {
+            // Trouver le parcours demandé
+            const parcours = courses.find(course => course.id === numero);
+            
+            if (parcours) {
+                console.log(`✅ Parcours ${numero} chargé:`, parcours.name);
+                displayParcours(parcours.markers, parcours.name);
+            } else {
+                throw new Error(`Parcours ${numero} non trouvé dans le JSON`);
+            }
+        })
+        .catch(error => {
+            console.error('❌ Erreur:', error);
+            alert('Erreur lors du chargement du parcours: ' + error.message);
+        });
+} // ← FIN de la fonction, PAS d'autres lignes après !
 
     function initMap() {
         const options = {
