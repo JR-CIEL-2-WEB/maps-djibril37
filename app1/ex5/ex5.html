@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Parcours Running - Google Maps</title>
+    <style>
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Menu Hamburger pour Google Maps */
+        .maps-hamburger {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .maps-menu-btn {
+            background: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .maps-menu-btn span {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: #333;
+            margin: 2px 0;
+            transition: 0.3s;
+        }
+
+        .maps-menu-content {
+            position: absolute;
+            top: 60px;
+            left: 0;
+            background: white;
+            border-radius: 10px;
+            padding: 10px 0;
+            min-width: 200px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .maps-menu-content.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .maps-menu-content a {
+            display: block;
+            padding: 12px 15px;
+            color: #333;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #eee;
+        }
+
+        .maps-menu-content a:last-child {
+            border-bottom: none;
+        }
+
+        .maps-menu-content a:hover {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Menu Hamburger -->
+<div class="maps-hamburger">
+    <button class="maps-menu-btn" id="mapsMenuBtn">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+    <div class="maps-menu-content" id="mapsMenuContent">
+        <a href="Parkours.html">🎯 Voir les Parcours</a>
+        <a href="#" onclick="loadParcours(1)">Parcours 1</a>
+        <a href="#" onclick="loadParcours(2)">Parcours 2</a>
+        <a href="#" onclick="loadParcours(3)">Parcours 3</a>
+    </div>
+</div>
+
+<div id="map">...</div>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA7Y32T_PJHZxYcK3BJYJFNwSl6cuvLXpo"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+    let markers = [];
+    let map;
+    let currentPolyline = null;
+
+    // Au chargement de la page
+    $(document).ready(function() {
+        initMap();
+        // Charger un parcours par défaut si besoin
+        // loadParcours(1);
+    });
+
+    // Gestion du menu hamburger
+    const mapsMenuBtn = document.getElementById('mapsMenuBtn');
+    const mapsMenuContent = document.getElementById('mapsMenuContent');
+
+    mapsMenuBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        mapsMenuContent.classList.toggle('show');
+    });
+
+    document.addEventListener('click', function() {
+        mapsMenuContent.classList.remove('show');
+    });
+
+    mapsMenuContent.addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+
+    // Charger un parcours spécifique
+    // Charger un parcours spécifique AVEC FETCH
+function loadParcours(numero) {
+    mapsMenuContent.classList.remove('show');
+    
+    console.log(`🎯 Chargement du parcours ${numero} depuis le JSON...`);
+    
+    // REQUÊTE FETCH vers le fichier JSON
+    fetch('../ext5/course.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erreur de chargement du fichier JSON');
+            }
+            return response.json();
+        })
+        .then(courses => {
+            // Trouver le parcours demandé
+            const parcours = courses.find(course => course.id === numero);
+            
+            if (parcours) {
+                console.log(`✅ Parcours ${numero} chargé:`, parcours.name);
+                displayParcours(parcours.markers, parcours.name);
+            } else {
+                throw new Error(`Parcours ${numero} non trouvé dans le JSON`);
+            }
+        })
+        .catch(error => {
+            console.error('❌ Erreur:', error);
+            alert('Erreur lors du chargement du parcours: ' + error.message);
+        });
+} // ← FIN de la fonction, PAS d'autres lignes après !
+
+    function initMap() {
+        const options = {
+            center: new google.maps.LatLng(48.9500, 2.5300), // Centre sur Sevran
+            zoom: 13,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+
+        map = new google.maps.Map(document.getElementById("map"), options);
+    }
+
+    function displayParcours(parcoursMarkers, titre) {
+        // Effacer les marqueurs précédents
+        clearMarkers();
+        
+        // Créer un tableau pour le chemin
+        const path = [];
+
+        // Afficher les marqueurs du parcours
+        for (let i = 0; i < parcoursMarkers.length; i++) {
+            const point = new google.maps.LatLng(parcoursMarkers[i].lat, parcoursMarkers[i].lng);
+            path.push(point);
+
+            const marker = new google.maps.Marker({
+                position: point,
+                map: map,
+                title: `${titre} - Point ${i + 1}`,
+                label: (i + 1).toString()
+            });
+
+            const infowindow = new google.maps.InfoWindow({
+                content: `<strong>${titre}</strong><br>Point ${i + 1}`
+            });
+
+            marker.addListener('click', function() {
+                infowindow.open(map, marker);
+            });
+
+            markers.push(marker);
+        }
+
+        // Centrer la carte sur le parcours
+        if (path.length > 0) {
+            const bounds = new google.maps.LatLngBounds();
+            path.forEach(point => bounds.extend(point));
+            map.fitBounds(bounds);
+        }
+
+        // Dessiner la polyline
+        if (currentPolyline) {
+            currentPolyline.setMap(null);
+        }
+
+        currentPolyline = new google.maps.Polyline({
+            path: path,
+            geodesic: true,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 4,
+            map: map
+        });
+    }
+
+    function clearMarkers() {
+        markers.forEach(marker => marker.setMap(null));
+        markers = [];
+    }
+</script>
+
+</body>
+</html>
