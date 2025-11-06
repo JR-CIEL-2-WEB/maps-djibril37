@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>JSON CDs</title>
+</head>
+<body>
+
+<h1>JSON.parse() via Ajax</h1>
+<hr>
+<div id="demo">...</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    // au chargement de la page
+    window.onload = loadDoc;
+
+    // Ajax avec jQuery
+    function loadDoc() {
+        $.ajax({
+            url: "cd_catalog.json",       // fichier JSON au même niveau
+            method: "GET",         // récupération des données
+            dataType: "json",      // jQuery parse automatiquement le JSON
+            success: function(CDs){
+                // CDs est maintenant un tableau d'objets
+                for (var i = 0; i < CDs.length; i++) {
+                    console.log("CD[" + i + "]=");
+                    var cd = CDs[i];
+                    for (var cle in cd) {
+                        console.log(cle + ": " + cd[cle]);
+                    }
+                    console.log("--------------------");
+                }
+            },
+            error: function(err) {
+                console.error("Erreur lors du chargement du fichier JSON :", err);
+            }
+        });
+    };
+</script>
+
+</body>
+</html>
