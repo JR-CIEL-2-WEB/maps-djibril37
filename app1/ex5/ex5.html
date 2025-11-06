@@ -11,7 +11,6 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
         }
         
         /* Menu Hamburger pour Google Maps */
@@ -83,19 +82,6 @@
         .maps-menu-content a:hover {
             background: #f0f0f0;
         }
-
-        /* Indicateur de parcours */
-        .parcours-indicator {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            padding: 10px 20px;
-            border-radius: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            font-weight: bold;
-            z-index: 999;
-        }
     </style>
 </head>
 <body>
@@ -108,16 +94,11 @@
         <span></span>
     </button>
     <div class="maps-menu-content" id="mapsMenuContent">
-        <a href="Parkours.html">🎯 Changer de Parcours</a>
+        <a href="Parkours.html">🎯 Voir les Parcours</a>
         <a href="#" onclick="loadParcours(1)">Parcours 1</a>
         <a href="#" onclick="loadParcours(2)">Parcours 2</a>
         <a href="#" onclick="loadParcours(3)">Parcours 3</a>
     </div>
-</div>
-
-<!-- Indicateur du parcours actuel -->
-<div class="parcours-indicator" id="parcoursIndicator">
-    Chargement...
 </div>
 
 <div id="map">...</div>
@@ -129,22 +110,12 @@
     let markers = [];
     let map;
     let currentPolyline = null;
-    let currentParcours = null;
 
     // Au chargement de la page
     $(document).ready(function() {
         initMap();
-        
-        // Récupérer le paramètre parcours depuis l'URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const parcoursParam = urlParams.get('parcours');
-        
-        if (parcoursParam) {
-            loadParcours(parseInt(parcoursParam));
-        } else {
-            // Par défaut, charger le parcours 1
-            loadParcours(1);
-        }
+        // Charger un parcours par défaut si besoin
+        // loadParcours(1);
     });
 
     // Gestion du menu hamburger
@@ -164,9 +135,41 @@
         e.stopPropagation();
     });
 
+    // Charger un parcours spécifique
+    // Charger un parcours spécifique AVEC FETCH
+function loadParcours(numero) {
+    mapsMenuContent.classList.remove('show');
+    
+    console.log(`🎯 Chargement du parcours ${numero} depuis le JSON...`);
+    
+    // REQUÊTE FETCH vers le fichier JSON
+    fetch('courses.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erreur de chargement du fichier JSON');
+            }
+            return response.json();
+        })
+        .then(courses => {
+            // Trouver le parcours demandé
+            const parcours = courses.find(course => course.id === numero);
+            
+            if (parcours) {
+                console.log(`✅ Parcours ${numero} chargé:`, parcours.name);
+                displayParcours(parcours.markers, parcours.name);
+            } else {
+                throw new Error(`Parcours ${numero} non trouvé dans le JSON`);
+            }
+        })
+        .catch(error => {
+            console.error('❌ Erreur:', error);
+            alert('Erreur lors du chargement du parcours: ' + error.message);
+        });
+} 
+
     function initMap() {
         const options = {
-            center: new google.maps.LatLng(48.9500, 2.5300),
+            center: new google.maps.LatLng(48.9500, 2.5300), // Centre sur Sevran
             zoom: 13,
             mapTypeId: google.maps.MapTypeId.ROADMAP
         };
@@ -174,41 +177,14 @@
         map = new google.maps.Map(document.getElementById("map"), options);
     }
 
-    function loadParcours(numero) {
-        mapsMenuContent.classList.remove('show');
-        currentParcours = numero;
-        
-        // Mettre à jour l'indicateur
-        document.getElementById('parcoursIndicator').textContent = `Parcours ${numero}`;
-        
-        // Définir les coordonnées pour chaque parcours
-        const parcoursData = {
-            1: [
-                { lat: 48.9400, lng: 2.5300, name: "Parc de la BUT (Départ)" },
-                { lat: 48.9350, lng: 2.5200, name: "Point intermédiaire" },
-                { lat: 48.9300, lng: 2.5100, name: "Parc du Sausset (Arrivée)" }
-            ],
-            2: [
-                { lat: 48.9450, lng: 2.5350, name: "Collège Pléiade (Départ)" },
-                { lat: 48.9420, lng: 2.5280, name: "Point intermédiaire" },
-                { lat: 48.9380, lng: 2.5220, name: "Lycée Voillum (Arrivée)" }
-            ],
-            3: [
-                { lat: 48.9480, lng: 2.5400, name: "Cité Basse (Départ)" },
-                { lat: 48.9520, lng: 2.5380, name: "Point intermédiaire" },
-                { lat: 48.9600, lng: 2.5386, name: "Lycée Jean-Rostand (Arrivée)" }
-            ]
-        };
-
-        displayParcours(parcoursData[numero], `Parcours ${numero}`);
-    }
-
     function displayParcours(parcoursMarkers, titre) {
         // Effacer les marqueurs précédents
         clearMarkers();
         
+        // Créer un tableau pour le chemin
         const path = [];
 
+        // Afficher les marqueurs du parcours
         for (let i = 0; i < parcoursMarkers.length; i++) {
             const point = new google.maps.LatLng(parcoursMarkers[i].lat, parcoursMarkers[i].lng);
             path.push(point);
@@ -216,12 +192,12 @@
             const marker = new google.maps.Marker({
                 position: point,
                 map: map,
-                title: parcoursMarkers[i].name,
+                title: `${titre} - Point ${i + 1}`,
                 label: (i + 1).toString()
             });
 
             const infowindow = new google.maps.InfoWindow({
-                content: `<strong>${parcoursMarkers[i].name}</strong><br>${titre} - Point ${i + 1}`
+                content: `<strong>${titre}</strong><br>Point ${i + 1}`
             });
 
             marker.addListener('click', function() {
